@@ -1,11 +1,19 @@
 # Initialize swarm's positions, velocities, and get lower and upper bounds
 
 function initialize(ps::ParticleSwarm, r::Union{ParamRange, Tuple{ParamRange, Any}})
-    return intialize(ps, [r])
+    return initialize(ps, [r])
 end
 
 function initialize(ps::ParticleSwarm, rs::AbstractVector)
-    R, lens, X = mapreduce(r -> _initialize(ps, r), (r1, r2) -> vcat.(r1, r2), rs)
+    R = ParamRange[]
+    lens = Int[]
+    X = Matrix{Float64}(undef, 0, ps.n_particles)
+    for r in rs
+        rᵢ, len, Xᵢ = _initialize(ps, r)
+        push!(R, rᵢ)
+        push!(lens, len)
+        X = vcat(X, Xᵢ)
+    end
     I = _indices(lens)
     V = zero(X)
     pbest_X = similar(X)
@@ -15,7 +23,7 @@ function initialize(ps::ParticleSwarm, rs::AbstractVector)
     return ParticleSwarmState(R, I, X, V, pbest_X, gbest_X, pbest, gbest)
 end
 
-_initialize(ps, t::Tuple{Union{ParamRange, Any}}) = _initialize(ps, t[1], t[2])
+_initialize(ps, t::Union{ParamRange, Tuple{ParamRange, Any}}) = _initialize(ps, t[1], t[2])
 
 # Initialize hyperparameters with default distribution types
 
@@ -71,11 +79,11 @@ end
 # Get ranges' corresponding indices
 
 function _indices(lens)
-    indices = CartesianIndices{1, Tuple{UnitRange{Int}}}[]
+    indices = UnitRange{Int}[]
     start = 1
     for len in lens
         stop = start + len - 1
-        push!(indices, CartesianIndices((start:stop,)))
+        push!(indices, start:stop)
         start = stop + 1
     end
     return indices
