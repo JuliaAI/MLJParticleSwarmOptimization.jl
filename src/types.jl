@@ -3,7 +3,7 @@ struct ParticleSwarm{R<:AbstractRNG}
     rng::R
     # TODO: topology
 
-    function ParticleSwarm(n_particles, rng::R) where {R}
+    function ParticleSwarm(n_particles, rng::R=Random.GLOBAL_RNG) where {R}
         n_particles < 3 && throw(ArgumentError("There must be at least 3 particles."))
         return new{R}(n_particles, rng)
     end
