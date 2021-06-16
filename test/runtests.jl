@@ -1,6 +1,9 @@
 using ParticleSwarmOptimization
+using Distributions
+using MLJBase
+using StableRNGs
 using Test
 
-@testset "ParticleSwarmOptimization.jl" begin
-    # Write your tests here.
-end
+const PSO = ParticleSwarmOptimization
+
+include("initialize.jl")
