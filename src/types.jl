@@ -11,7 +11,7 @@ end
 
 struct ParticleSwarmState
     R::Vector{ParamRange}
-    I::Vector{CartesianIndices}
+    I::Vector{UnitRange{Int}}
     X::Matrix{Float64}
     V::Matrix{Float64}
     pbest_X::Matrix{Float64}
