@@ -8,14 +8,13 @@ Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 MLJTuning = "03970b2e-30c4-11ea-3135-d1576263f10f"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 julia = "1"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test", "StableRNGs"]

@@ -1,21 +1,31 @@
-struct ParticleSwarm{R<:AbstractRNG}
+struct ParticleSwarm{C, R<:AbstractRNG}
     n_particles::Int
+    coefficients::C
     rng::R
     # TODO: topology
 
-    function ParticleSwarm(n_particles, rng::R=Random.GLOBAL_RNG) where {R}
+    function ParticleSwarm{C, R}(n_particles, coefficients, rng) where {C, R}
         n_particles < 3 && throw(ArgumentError("There must be at least 3 particles."))
-        return new{R}(n_particles, rng)
+        return new(n_particles, coefficients, rng)
     end
 end
 
-struct ParticleSwarmState
-    R::Vector{ParamRange}
-    I::Vector{UnitRange{Int}}
-    X::Matrix{Float64}
-    V::Matrix{Float64}
-    pbest_X::Matrix{Float64}
-    gbest_X::Matrix{Float64}
-    pbest::Vector{Float64}
-    gbest::Vector{Float64}
+function ParticleSwarm(
+    n_particles=3;
+    coefficients::C=(1., 2., 2.),
+    rng::R=Random.GLOBAL_RNG
+) where {C, R}
+    return ParticleSwarm{C, R}(n_particles, coefficients, rng)
+end
+
+struct ParticleSwarmState{T, R, P, I}
+    ranges::R
+    parameters::P
+    indices::I
+    X::Matrix{T}
+    V::Matrix{T}
+    pbest_X::Matrix{T}
+    gbest_X::Matrix{T}
+    pbest::Vector{T}
+    gbest::Vector{T}
 end
