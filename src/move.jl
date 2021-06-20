@@ -3,7 +3,8 @@
 function move!(state::ParticleSwarmState{T}, ps::ParticleSwarm) where {T}
     rng, X, V = ps.rng, state.X, state.V
     w, c1, c2 = T.(coefficients(ps.coefficients))
-    @. V = w*V + c1*rand(rng)*(state.pbest_X - X) + c2*rand(rng)*(state.gbest_X - X)
+    V .= w.*V .+ c1.*rand.(Ref(rng)).*(state.pbest_X .- X) .+
+                 c2.*rand.(Ref(rng)).*(state.gbest_X .- X)
     X .+= V
     for (r, idx) in zip(state.ranges, state.indices)
         constrain!(r, view(X, :, idx))
