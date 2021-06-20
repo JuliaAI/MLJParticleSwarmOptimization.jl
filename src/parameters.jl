@@ -10,7 +10,7 @@ end
 
 function initialize(rs::AbstractVector, ps::ParticleSwarm)
     n = ps.n_particles
-    ranges, parameters, lens, Xᵢ = zip(_initialize.(ps.rng, rs, n)...)
+    ranges, parameters, lens, Xᵢ = zip(_initialize.(Ref(ps.rng), rs, n)...) # wrapped in Ref for compat with Julia 1.0
     indices = _to_indices(lens)
     X = hcat(Xᵢ...)
     V = zero(X)
@@ -105,7 +105,10 @@ function retrieve!(state::ParticleSwarmState, ps::ParticleSwarm)
 end
 
 function _retrieve!(rng, p, r::NominalRange, X)
-    return p .= getindex.((r.values,), rand.(rng, Categorical.(X[i,:] for i in axes(X, 1))))
+    return p .= getindex.(
+        Ref(r.values),
+        rand.(Ref(rng), Categorical.(X[i,:] for i in axes(X, 1))) # wrapped in Ref for compat with Julia 1.0
+    )
 end
 
 function _retrieve!(rng, p, r::NumericRange{T}, X) where {T<:Integer}
