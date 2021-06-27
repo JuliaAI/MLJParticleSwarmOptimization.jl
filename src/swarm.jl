@@ -1,4 +1,4 @@
-struct ParticleSwarm{C, R<:AbstractRNG}
+mutable struct ParticleSwarm{C, R<:AbstractRNG}
     n_particles::Int
     coefficients::C
     rng::R
@@ -12,10 +12,17 @@ end
 
 function ParticleSwarm(
     n_particles=3;
-    coefficients::C=(1., 2., 2.),
+    coefficients::C=StaticCoeffs(),
     rng::R=Random.GLOBAL_RNG
 ) where {C, R}
     return ParticleSwarm{C, R}(n_particles, coefficients, rng)
+end
+
+function Base.setproperty!(ps::ParticleSwarm, sym::Symbol, val)
+    if sym === :n_particles && val < 3
+        throw(ArgumentError("There must be at least 3 particles."))
+    end
+    return setfield!(ps, sym, val)
 end
 
 struct ParticleSwarmState{T, R, P, I}

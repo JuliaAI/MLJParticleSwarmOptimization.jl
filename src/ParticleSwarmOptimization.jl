@@ -5,11 +5,11 @@ using Distributions
 using MLJBase
 using MLJTuning
 
-export ParticleSwarm
+export StaticCoeffs, ParticleSwarm
 
-include("types.jl")
+include("options.jl")
+include("swarm.jl")
 include("parameters.jl")
-include("move.jl")
 include("update.jl")
 
 end

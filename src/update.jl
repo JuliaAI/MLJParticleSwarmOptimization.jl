@@ -1,9 +1,33 @@
+# Move the swarm
+
+function move!(state::ParticleSwarmState{T}, ps::ParticleSwarm) where {T}
+    rng, X, V = ps.rng, state.X, state.V
+    w, c1, c2 = T.(coefficients(ps.coefficients))
+    V .= w.*V .+ c1.*rand.(Ref(rng)).*(state.pbest_X .- X) .+
+                 c2.*rand.(Ref(rng)).*(state.gbest_X .- X)
+    X .+= V
+    for (r, idx) in zip(state.ranges, state.indices)
+        constrain!(r, view(X, :, idx))
+    end
+    return state
+end
+
+# Constrain particles' positions
+
+function constrain!(r::NominalRange, X)
+    T = eltype(X)
+    @. X = min(one(T), max(zero(T), X))
+    return X ./= sum(X, dims=2)
+end
+
+constrain!(r::NumericRange, X) = @. X = min(r.upper, max(r.lower, X))
+
 # Update pbest
 
 function pbest!(state::ParticleSwarmState, ps::ParticleSwarm, measurements)
     X, pbest, pbest_X = state.X, state.pbest, state.pbest_X
     improved = measurements .<= pbest
-    pbest[improved] .= measurements
+    pbest[improved] .= measurements[improved]
     for (r, p, i) in zip(state.ranges, state.parameters, state.indices)
         _shift!(view(pbest_X, improved, i), view(X, improved, i), r, p)
     end
