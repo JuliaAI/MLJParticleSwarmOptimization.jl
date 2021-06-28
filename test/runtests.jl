@@ -12,4 +12,5 @@ const PSO = ParticleSwarmOptimization
     include("swarm.jl")
     include("parameters.jl")
     include("update.jl")
+    include("problems.jl")
 end
