@@ -16,7 +16,7 @@ end
 
 function constrain!(r::NominalRange, X)
     T = eltype(X)
-    @. X = min(one(T), max(zero(T), X))
+    @. X = min(one(T), max(eps(T), X))
     return X ./= sum(X, dims=2)
 end
 
