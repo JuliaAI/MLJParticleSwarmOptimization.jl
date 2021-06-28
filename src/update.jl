@@ -2,7 +2,7 @@
 
 function move!(state::ParticleSwarmState{T}, ps::ParticleSwarm) where {T}
     rng, X, V = ps.rng, state.X, state.V
-    w, c1, c2 = T.(coefficients(ps.coefficients))
+    w, c1, c2 = T.(coefficients(ps.coeffs))
     V .= w.*V .+ c1.*rand.(Ref(rng)).*(state.pbest_X .- X) .+
                  c2.*rand.(Ref(rng)).*(state.gbest_X .- X)
     X .+= V
@@ -26,21 +26,21 @@ constrain!(r::NumericRange, X) = @. X = min(r.upper, max(r.lower, X))
 
 function pbest!(state::ParticleSwarmState, ps::ParticleSwarm, measurements)
     X, pbest, pbest_X = state.X, state.pbest, state.pbest_X
+    prob_shift = ps.prob_shift
     improved = measurements .<= pbest
     pbest[improved] .= measurements[improved]
     for (r, p, i) in zip(state.ranges, state.parameters, state.indices)
-        _shift!(view(pbest_X, improved, i), view(X, improved, i), r, p)
+        @views _pbest!(pbest_X[improved, i], X[improved, i], r, p[improved], prob_shift)
     end
     return state
 end
 
-_shift!(pbest_X, X, r::ParamRange, p) = pbest_X .= X
+_pbest!(pbest_X, X, r::ParamRange, p, prob_shift) = pbest_X .= X
 
-function _shift!(pbest_X, X, r::NominalRange, p)
-    T = eltype(X)
-    pbest_X .= X .* T(0.75)
+function _pbest!(pbest_X, X, r::NominalRange, p, prob_shift)
+    pbest_X .= X .* prob_shift
     samples = map(pᵢ -> findfirst(pᵢ .== r.values), p)
-    pbest_X[CartesianIndex.(axes(pbest_X, 1), samples)] .+= T(0.25)
+    pbest_X[CartesianIndex.(axes(pbest_X, 1), samples)] .+= 1 - prob_shift
     return pbest_X
 end
 
