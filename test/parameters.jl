@@ -52,15 +52,15 @@
     end
 
     @testset "Initialize one range" begin
-        ps = ParticleSwarm(3; rng=StableRNG(1234))
-        state = PSO.initialize(r1,ps)
+        ps = ParticleSwarm(n_particles=3, rng=StableRNG(1234))
+        state = PSO.initialize(r1, ps)
         @test state.ranges == (r1,)
         @test state.indices == (1:3,)
         @test state.X == X1
     end
 
     @testset "Initialize multiple ranges" begin
-        ps = ParticleSwarm(3; rng=StableRNG(1234))
+        ps = ParticleSwarm(n_particles=3, rng=StableRNG(1234))
         ranges = [r1, (r2, Uniform), (r3, d3), r4]
         state = PSO.initialize(ranges, ps)
         @test state.ranges == (r1, r2, r3, r4)
@@ -69,7 +69,7 @@
     end
 
     @testset "Retrieve parameters" begin
-        ps = ParticleSwarm(3; rng=StableRNG(1234))
+        ps = ParticleSwarm(n_particles=3, rng=StableRNG(1234))
         ranges = [r1, (r2, Uniform), (r3, d3), r4]
         state = PSO.initialize(ranges, ps)
         PSO.retrieve!(state, ps)

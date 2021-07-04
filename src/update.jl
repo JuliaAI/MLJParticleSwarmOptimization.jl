@@ -2,7 +2,7 @@
 
 function move!(state::ParticleSwarmState{T}, ps::ParticleSwarm) where {T}
     rng, X, V = ps.rng, state.X, state.V
-    w, c1, c2 = T.(coefficients(ps.coeffs))
+    w, c1, c2 = T.((ps.w, ps.c1, ps.c2))
     V .= w.*V .+ c1.*rand.(Ref(rng)).*(state.pbest_X .- X) .+
                  c2.*rand.(Ref(rng)).*(state.gbest_X .- X)
     X .+= V
@@ -14,13 +14,14 @@ end
 
 # Constrain particles' positions
 
-function constrain!(r::NominalRange, X)
-    T = eltype(X)
+function constrain!(r::NominalRange, X::AbstractArray{T}) where {T}
     @. X = min(one(T), max(eps(T), X))
     return X ./= sum(X, dims=2)
 end
 
-constrain!(r::NumericRange, X) = @. X = min(r.upper, max(r.lower, X))
+function constrain!(r::NumericRange, X::AbstractArray{T}) where {T}
+    return @. X = min(T(r.upper), max(T(r.lower), X))
+end
 
 # Update pbest
 
@@ -37,10 +38,12 @@ end
 
 _pbest!(pbest_X, X, r::ParamRange, p, prob_shift) = pbest_X .= X
 
-function _pbest!(pbest_X, X, r::NominalRange, p, prob_shift)
-    pbest_X .= X .* prob_shift
-    samples = map(pᵢ -> findfirst(pᵢ .== r.values), p)
-    pbest_X[CartesianIndex.(axes(pbest_X, 1), samples)] .+= 1 - prob_shift
+function _pbest!(pbest_X::AbstractArray{T}, X, r::NominalRange, p, prob_shift) where {T}
+    pbest_X .= X .* (one(T) - T(prob_shift))
+    sampled = map(pᵢ -> findfirst(==(pᵢ), r.values), p)
+    for (i, j) in zip(axes(pbest_X, 1), sampled)
+        pbest_X[i, j] += T(prob_shift)
+    end
     return pbest_X
 end
 

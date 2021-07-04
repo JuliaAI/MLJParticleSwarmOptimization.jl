@@ -7,9 +7,9 @@ using MLJTuning
 
 export StaticCoeffs, ParticleSwarm
 
-include("options.jl")
 include("swarm.jl")
 include("parameters.jl")
 include("update.jl")
+include("tuning.jl")
 
 end

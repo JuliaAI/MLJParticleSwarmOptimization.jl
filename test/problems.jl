@@ -23,7 +23,7 @@
         @testset "Numeric Ackley" begin
             r1 = range(Float64, :r1; lower=-2.0, upper=2.0)
             r2 = range(Float64, :r2; lower=-2.0, upper=2.0)
-            ps = ParticleSwarm(10; rng=StableRNG(1234))
+            ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
             min, params = optimize([r1, r2], ps) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
@@ -35,7 +35,7 @@
         @testset "Integer Ackley" begin
             r1 = range(Int, :r1; lower=-20, upper=20)
             r2 = range(Int, :r2; lower=-20, upper=20)
-            ps = ParticleSwarm(10; rng=StableRNG(1234))
+            ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
             min, params = optimize([r1, r2], ps) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
@@ -45,66 +45,48 @@
         end
 
         @testset "Nominal Ackley" begin
-            vals = shuffle(StableRNG(1234), -5:5)
+            vals = shuffle(StableRNG(1234), -2:2)
             r1 = range(Int, :r1; values=vals)
             r2 = range(Int, :r2; values=vals)
-            ps = ParticleSwarm(10; rng=StableRNG(1234))
+            ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
             min, params = optimize([r1, r2], ps) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
             end
             @test min == 4.440892098500626e-16
             @test params == [
-                1.1102230246251541e-16
-                0.9999999999999989
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                0.9999999999999989
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
-                1.1102230246251541e-16
+                0.9999999999999993
+                1.6653345369377333e-16
+                1.6653345369377333e-16
+                1.6653345369377333e-16
+                1.6653345369377333e-16
+                0.9999999999999993
+                1.6653345369377333e-16
+                1.6653345369377333e-16
+                1.6653345369377333e-16
+                1.6653345369377333e-16
             ]
         end
 
         @testset "Mixed Ackley" begin
-            vals = shuffle(StableRNG(1234), -5:5)
+            vals = shuffle(StableRNG(1234), -2:2)
             r1 = range(Float64, :r1; lower=-2.0, upper=2.0)
             r2 = range(Int, :r2; lower=-20, upper=20)
             r3 = range(Int, :r3; values=vals)
-            ps = ParticleSwarm(10; rng=StableRNG(1234))
-            min, params = optimize([r1, r2, r3], ps) do pairs
+            ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
+            min, params = optimize([r1, r2, r3], ps; iter=1000) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
             end
-            @test min == 0.6076682055431353
+            @test min == 0.020697608715345428
             @test params == [
-                0.13633193086512696
-                0.493158178459141
-                2.4528223309105355e-16
-                0.928167047251085
-                0.07176578722275799
-                2.4528223309105355e-16
-                6.716552615509147e-5
-                2.4528223309105355e-16
-                2.4528223309105355e-16
-                2.4528223309105355e-16
-                2.4528223309105355e-16
-                2.4528223309105355e-16
-                2.4528223309105355e-16
+                 0.008417879502700232
+                -0.24827995845277284
+                 0.6479650806289863
+                 8.836599910222148e-17
+                 8.836599910222148e-17
+                 0.35203491937101344
+                 8.836599910222148e-17
             ]
         end
     end
