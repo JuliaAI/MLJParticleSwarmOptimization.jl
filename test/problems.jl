@@ -1,5 +1,5 @@
 @testset "Optimize" begin
-    function optimize(f, ranges, ps::ParticleSwarm; iter=100)
+    function optimize(f, ranges, ps::ParticleSwarm, iter::Int)
         fields = getproperty.(ranges, :field)
         state = PSO.initialize(ranges, ps)
         for i in 1:iter
@@ -24,24 +24,22 @@
             r1 = range(Float64, :r1; lower=-2.0, upper=2.0)
             r2 = range(Float64, :r2; lower=-2.0, upper=2.0)
             ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
-            min, params = optimize([r1, r2], ps) do pairs
+            min, params = optimize([r1, r2], ps, 1_500_000) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
             end
-            @test min == 0.025024426526485843
-            @test params == [0.007929194115617544; -0.0021395968528412634]
+            @test all(isapprox.(params, 0, atol=3)) # analytical solution
         end
 
         @testset "Integer Ackley" begin
             r1 = range(Int, :r1; lower=-20, upper=20)
             r2 = range(Int, :r2; lower=-20, upper=20)
             ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
-            min, params = optimize([r1, r2], ps) do pairs
+            min, params = optimize([r1, r2], ps, 100) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
             end
-            @test min == 4.440892098500626e-16
-            @test params == [-0.08146121382756652, -0.1797998643479164]
+            @test all(round.(params) .== 0) # analytical solution
         end
 
         @testset "Nominal Ackley" begin
@@ -49,23 +47,12 @@
             r1 = range(Int, :r1; values=vals)
             r2 = range(Int, :r2; values=vals)
             ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
-            min, params = optimize([r1, r2], ps) do pairs
+            min, params = optimize([r1, r2], ps, 100) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
             end
-            @test min == 4.440892098500626e-16
-            @test params == [
-                0.9999999999999993
-                1.6653345369377333e-16
-                1.6653345369377333e-16
-                1.6653345369377333e-16
-                1.6653345369377333e-16
-                0.9999999999999993
-                1.6653345369377333e-16
-                1.6653345369377333e-16
-                1.6653345369377333e-16
-                1.6653345369377333e-16
-            ]
+            true_params = [1., 0., 0., 0., 0., 1., 0., 0., 0., 0.] # analytical solution
+            @test all(isapprox.(params, true_params, atol=1e-3))
         end
 
         @testset "Mixed Ackley" begin
@@ -74,20 +61,14 @@
             r2 = range(Int, :r2; lower=-20, upper=20)
             r3 = range(Int, :r3; values=vals)
             ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
-            min, params = optimize([r1, r2, r3], ps; iter=1000) do pairs
+            min, params = optimize([r1, r2, r3], ps, 15000) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
             end
-            @test min == 0.020697608715345428
-            @test params == [
-                 0.008417879502700232
-                -0.24827995845277284
-                 0.6479650806289863
-                 8.836599910222148e-17
-                 8.836599910222148e-17
-                 0.35203491937101344
-                 8.836599910222148e-17
-            ]
+            # Compare with analytical solution
+            @test isapprox(params[1], 0, atol=1e-3)
+            @test round(params[2]) == 0
+            @test argmax(params[3:7]) == 1
         end
     end
 end

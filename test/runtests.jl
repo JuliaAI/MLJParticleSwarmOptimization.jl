@@ -12,6 +12,6 @@ const PSO = ParticleSwarmOptimization
 @testset "Particle Swarm" begin
     include("parameters.jl")
     include("update.jl")
-    include("tuning.jl")
     include("problems.jl")
+    include("strategies/basic.jl")
 end

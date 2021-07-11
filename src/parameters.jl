@@ -4,13 +4,17 @@
 
 # Initialize particle swarm state
 
-function initialize(r::Union{ParamRange, Tuple{ParamRange, Any}}, ps::ParticleSwarm)
-    return initialize([r], ps)
+function initialize(
+    r::Union{ParamRange, Tuple{ParamRange, Any}},
+    tuning::AbstractParticleSwarm
+)
+    return initialize([r], tuning)
 end
 
-function initialize(rs::AbstractVector, ps::ParticleSwarm)
-    n = ps.n_particles
-    ranges, parameters, lens, Xᵢ = zip(_initialize.(Ref(ps.rng), rs, n)...) # wrapped in Ref for compat with Julia 1.0
+function initialize(rs::AbstractVector, tuning::AbstractParticleSwarm)
+    n = tuning.n_particles
+    # Wrap rng in Ref for compatibility with Julia <= 1.3
+    ranges, parameters, lens, Xᵢ = zip(_initialize.(Ref(tuning.rng), rs, n)...)
     indices = _to_indices(lens)
     X = hcat(Xᵢ...)
     V = zero(X)
@@ -95,9 +99,9 @@ end
 ### Retrieval
 ###
 
-function retrieve!(state::ParticleSwarmState, ps::ParticleSwarm)
+function retrieve!(state::ParticleSwarmState, tuning::AbstractParticleSwarm)
     ranges, params, indices, X = state.ranges, state.parameters, state.indices, state.X
-    rng = ps.rng
+    rng = tuning.rng
     for (r, p, i) in zip(ranges, params, indices)
         _retrieve!(rng, p, r, view(X, :, i))
     end
@@ -107,7 +111,8 @@ end
 function _retrieve!(rng, p, r::NominalRange, X)
     return p .= getindex.(
         Ref(r.values),
-        rand.(Ref(rng), Categorical.(X[i,:] for i in axes(X, 1))) # wrapped in Ref for compat with Julia 1.0
+        # Wrap rng in Ref for compatibility with Julia <= 1.3
+        rand.(Ref(rng), Categorical.(X[i,:] for i in axes(X, 1)))
     )
 end
 
