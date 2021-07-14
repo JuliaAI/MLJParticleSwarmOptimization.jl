@@ -148,7 +148,8 @@ function MLJTuning.models(
     n_particles = tuning.n_particles
     if !isnothing(history)
         sig = MLJTuning.signature(first(history).measure)
-        pbest!(state, tuning, map(h -> sig * h.measurement[1], last(history, n_particles)))
+        pbest!(state, tuning, map(h -> sig * h.measurement[1],
+                                  history[end-n_particles+1:end]))
         gbest!(state, tuning)
         move!(state, tuning)
     end
