@@ -11,12 +11,4 @@ MLJTuning = "03970b2e-30c4-11ea-3135-d1576263f10f"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
-julia = "1"
-
-[extras]
-EvoTrees = "f6006082-12f8-11e9-0c9c-0d5d367ab1e5"
-StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[targets]
-test = ["Test", "StableRNGs", "EvoTrees"]
+julia = "1.3"
