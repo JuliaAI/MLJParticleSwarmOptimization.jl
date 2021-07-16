@@ -13,8 +13,7 @@ end
 
 function initialize(rs::AbstractVector, tuning::AbstractParticleSwarm)
     n = tuning.n_particles
-    # Wrap rng in Ref for compatibility with Julia <= 1.3
-    ranges, parameters, lens, Xᵢ = zip(_initialize.(Ref(tuning.rng), rs, n)...)
+    ranges, parameters, lens, Xᵢ = zip(_initialize.(tuning.rng, rs, n)...)
     indices = _to_indices(lens)
     X = hcat(Xᵢ...)
     V = zero(X)
