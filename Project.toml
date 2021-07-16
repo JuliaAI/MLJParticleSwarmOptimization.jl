@@ -11,7 +11,7 @@ MLJTuning = "03970b2e-30c4-11ea-3135-d1576263f10f"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
-julia = "1.3"
 Distributions = "0.25"
 MLJBase = "0.18"
 MLJTuning = "0.6"
+julia = "1.4"
