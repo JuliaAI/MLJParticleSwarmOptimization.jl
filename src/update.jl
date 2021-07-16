@@ -3,9 +3,7 @@
 function move!(state::ParticleSwarmState{T}, tuning::AbstractParticleSwarm) where {T}
     rng, X, V = tuning.rng, state.X, state.V
     w, c1, c2 = T(tuning.w), T(tuning.c1), T(tuning.c2)
-    # Wrap rng in Ref for compatibility with Julia <= 1.3
-    V .= w.*V .+ c1.*rand.(Ref(rng), T).*(state.pbest_X .- X) .+
-                 c2.*rand.(Ref(rng), T).*(state.gbest_X .- X)
+    @. V = w*V + c1*rand(rng, T)*(state.pbest_X - X) + c2*rand(rng, T)*(state.gbest_X - X)
     X .+= V
     for (r, idx) in zip(state.ranges, state.indices)
         constrain!(r, view(X, :, idx))
