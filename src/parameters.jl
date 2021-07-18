@@ -13,8 +13,9 @@ end
 
 function initialize(rs::AbstractVector, tuning::AbstractParticleSwarm)
     n = tuning.n_particles
-    ranges, parameters, lens, Xᵢ = zip(_initialize.(tuning.rng, rs, n)...)
-    indices = _to_indices(lens)
+    # `length` is 1 for `NumericRange` and the number of categories for `NominalRange`
+    ranges, parameters, lengths, Xᵢ = zip(_initialize.(tuning.rng, rs, n)...)
+    indices = _to_indices(lengths)
     X = hcat(Xᵢ...)
     V = zero(X)
     pbest_X = copy(X)
@@ -83,13 +84,14 @@ function _initialize(rng, r::NumericRange{T}, d::UnivariateDistribution, n) wher
 end
 
 # Helper function to get ranges' corresponding indices
+# E.g., `_to_indices((1, 2, 1, 3))` returns `(1, 2:3, 4, 5:7)`
 
-function _to_indices(lens)
-    curr = Ref(1)
-    return map(lens) do len
-        start = curr[]
-        stop = start + len - 1
-        curr[] = stop + 1
+function _to_indices(lengths)
+    curr = 1
+    return map(lengths) do length
+        start = curr
+        stop = start + length - 1
+        curr = stop + 1
         start == stop ? stop : (start:stop)
     end
 end
@@ -97,6 +99,9 @@ end
 ###
 ### Retrieval
 ###
+
+# For updating `state.parameters`, the model hyperparameters to be returned, from their
+# internal representation `state.X`
 
 function retrieve!(state::ParticleSwarmState, tuning::AbstractParticleSwarm)
     ranges, params, indices, X = state.ranges, state.parameters, state.indices, state.X
