@@ -19,13 +19,12 @@
     lengths = (3, 1, 1, 1)
     # Test range's corresponding indices in internal representation state.X
     indices = (1:3, 4, 5, 6)
-    # Generated samples from d1, d2, d3, d4 with StableRNG(1234)
-    X1 = [0.14280010160187237 0.49409071076694583 0.3631091876311819;
-          0.295010672512568   0.4534584876713112  0.25153083981612073;
-          0.12881930462550284 0.2617407494915029  0.6094399458829942]
-    X2 = [2.7429797605672808, 2.3976392099947, 2.5742724788985445]
-    X3 = [3.9372495283243105, 3.6569395920512977, 3.6354556967115146]
-    X4 = [-0.8067647083847199, 0.420991611378423, 0.6736019046580138]
+    # Initial hyperparameter representation
+    rng = StableRNG(1234)
+    X1 = rand(rng, d1, n)'
+    X2 = rand(rng, d2, n)
+    X3 = rand(rng, d3, n)
+    X4 = rand(rng, d4, n)
     Xs = (X1, X2, X3, X4)
 
     @testset "Initializer" begin
