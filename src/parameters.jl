@@ -110,8 +110,7 @@ end
 function _retrieve!(rng, p, r::NominalRange, X)
     return p .= getindex.(
         Ref(r.values),
-        # Wrap rng in Ref for compatibility with Julia <= 1.3
-        rand.(Ref(rng), Categorical.(X[i,:] for i in axes(X, 1)))
+        rand.(rng, Categorical.(X[i,:] for i in axes(X, 1)))
     )
 end
 
