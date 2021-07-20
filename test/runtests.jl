@@ -1,6 +1,7 @@
 using ParticleSwarmOptimization
 using Random
 using Test
+using ComputationalResources
 using Distributions
 using EvoTrees
 using MLJBase
