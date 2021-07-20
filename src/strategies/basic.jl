@@ -162,15 +162,18 @@ function MLJTuning.models(
     tuning::ParticleSwarm,
     model,
     history,
-    state,
+    state::ParticleSwarmState{T},
     n_remaining,
     verbosity
-)
+) where {T}
     n_particles = tuning.n_particles
     if !isnothing(history)
         sig = MLJTuning.signature(first(history).measure)
-        pbest!(state, tuning, map(h -> sig * h.measurement[1],
-                                  history[end-n_particles+1:end]))
+        measurements = Vector{T}(undef, n_particles)
+        map(history[end-n_particles+1:end]) do h
+            measurements[h.metadata] = sig * h.measurement[1]
+        end
+        pbest!(state, tuning, measurements)
         gbest!(state, tuning)
         move!(state, tuning)
     end
@@ -181,7 +184,7 @@ function MLJTuning.models(
         for (field, param) in zip(fields, getindex.(state.parameters, i))
             recursive_setproperty!(clone, field, param)
         end
-        clone
+        (clone, i)
     end
     return new_models, state
 end
