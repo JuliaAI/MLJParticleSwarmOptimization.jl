@@ -38,14 +38,12 @@ can be:
 
     - one of the distribution *types* in the table below, for automatic fitting
       using `Distributions.fit(d, r)` to a distribution whose support always
-      lies between `r.lower` and `r.upper` (for `NumericRange` `r`) or the set
-      of probability vectors (for `NominalRange` `r`)
+      lies between `r.lower` and `r.upper` (for `NumericRange` `r`)
 
 - any vector of objects of the above form
 
 | Range Types             | Distribution Types                                                                           |
 |:----------------------- |:-------------------------------------------------------------------------------------------- |
-| `NominalRange`          | `Dirichlet`                                                                                  |
 | Bounded `NumericRange`  | `Arcsine`, `Uniform`, `Biweight`, `Cosine`, `Epanechnikov`, `SymTriangularDist`, `Triweight` |
 | Positive `NumericRange` | `Gamma`, `InverseGaussian`, `Poisson`                                                        |
 | Any `NumericRange`      | `Normal`, `Logistic`, `LogNormal`, `Cauchy`, `Gumbel`, `Laplace`                             |
@@ -59,7 +57,7 @@ can be:
     range2 = [(range(model, :hyper1, lower=1, upper=10), Arcsine),
               range(model, :hyper2, lower=2, upper=Inf, unit=1, origin=3),
               (range(model, :hyper2, lower=2, upper=4), Normal(0, 3)),
-              (range(model, :hyper3, values=[:ball, :tree]), Dirichlet)]
+              range(model, :hyper3, values=[:ball, :tree])]
 
 ### Algorithm
 
