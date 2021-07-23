@@ -33,13 +33,17 @@ function _initialize(rng, t::Tuple{ParamRange, Any}, n)
     return _initialize(rng, t[1], t[2], n)
 end
 
-# Initialize parameters with default distribution types
+# Initialize parameters with default distributions
 
-_initialize(rng, r::ParamRange, n) = _initialize(rng, r, _initializer(r), n)
+function _initialize(rng, r::NominalRange{T, N}, n) where {T, N}
+    d = Dirichlet(ones(N))
+    return _initialize(rng, r, d, n)
+end
 
-_initializer(::NominalRange) = Dirichlet
-
-_initializer(r::NumericRange) = _initializer(MLJTuning.boundedness(r))
+function _initialize(rng, r::NumericRange, n)
+    D = _initializer(MLJTuning.boundedness(r))
+    return _initialize(rng, r, D, n)
+end
 
 _initializer(::Type{MLJBase.Bounded}) = Uniform
 
@@ -51,11 +55,6 @@ _initializer(::Type{MLJTuning.Other}) = Normal
 
 function _initialize(rng, r::ParamRange, D::Type{<:Distribution}, n)
     throw(ArgumentError("$D distribution is unsupported for $(typeof(r))."))
-end
-
-function _initialize(rng, r::NominalRange{T, N}, D::Type{Dirichlet}, n) where {T, N}
-    d = Dirichlet(ones(N))
-    return _initialize(rng, r, d, n)
 end
 
 function _initialize(rng, r::NumericRange, D::Type{<:UnivariateDistribution}, n)
