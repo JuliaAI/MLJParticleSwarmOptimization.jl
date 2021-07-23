@@ -1,6 +1,16 @@
-using ParticleSwarmOptimization
+using MLJParticleSwarmOptimization
+using Random
 using Test
+using ComputationalResources
+using Distributions
+using EvoTrees
+using MLJBase
+using MLJTuning
+using StableRNGs
 
-@testset "ParticleSwarmOptimization.jl" begin
-    # Write your tests here.
-end
+const PSO = MLJParticleSwarmOptimization
+
+include("parameters.jl")
+include("update.jl")
+include("problems.jl")
+include("strategies/basic.jl")
