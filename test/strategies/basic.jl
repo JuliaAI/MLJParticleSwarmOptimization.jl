@@ -38,7 +38,7 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
             acceleration=acceleration
         )
         baseline_mach = machine(baseline_self_tuning_tree, X, y)
-        fit!(baseline_mach, verbosity=2)
+        fit!(baseline_mach, verbosity=0)
         baseline_rep = report(baseline_mach)
         baseline_best_loss = baseline_rep.best_history_entry.measurement[1]
 
@@ -52,7 +52,7 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
             acceleration=acceleration
         )
         mach = machine(self_tuning_tree, X, y)
-        fit!(mach, verbosity=2)
+        fit!(mach, verbosity=0)
         rep = report(mach)
         best_loss = rep.best_history_entry.measurement[1]
 

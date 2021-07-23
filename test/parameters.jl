@@ -8,7 +8,7 @@
     r4 = range(Float32, :r4; lower=-Inf, upper=Inf, origin=0, unit=1)
     rs = (r1, r2, r3, r4)
     # Test distribution types
-    Ds = (Dirichlet, Uniform, Gamma, Normal)
+    Ds = (Uniform, Gamma, Normal)
     # Manually fitted distributions for test ranges
     d1 = Dirichlet(ones(3))
     d2 = Uniform(1, 3)
@@ -28,14 +28,15 @@
     Xs = (X1, X2, X3, X4)
 
     @testset "Initializer" begin
-        for (r, D) in zip(rs, Ds)
-            @test PSO._initializer(r) === D
+        for (r, D) in zip(rs[2:end], Ds)
+            @test PSO._initializer(MLJTuning.boundedness(r)) === D
         end
     end
 
     @testset "Initialize with distribution types" begin
         rng = StableRNG(1234)
-        for (r, D, l, X) in zip(rs, Ds, lengths, Xs)
+        PSO._initialize(rng, r1, n)
+        for (r, D, l, X) in zip(rs[2:end], Ds, lengths[2:end], Xs[2:end])
             r̂, l̂, X̂ = PSO._initialize(rng, r, D, n)[[1,3,4]]
             @test r̂ === r
             @test l̂ == l
@@ -60,6 +61,7 @@
     @testset "Unsupported distributions" begin
         rng = StableRNG(1234)
         @test_throws ArgumentError PSO._initialize(rng, r1, Uniform, n)
+        @test_throws ArgumentError PSO._initialize(rng, r1, Dirichlet, n)
         @test_throws ArgumentError PSO._initialize(rng, r1, d2, n)
         @test_throws ArgumentError PSO._initialize(rng, r1, Dirichlet(ones(4)), n)
         @test_throws ArgumentError PSO._initialize(rng, r2, Dirichlet, n)
