@@ -1,4 +1,4 @@
-using ParticleSwarmOptimization
+using MLJParticleSwarmOptimization
 using Random
 using Test
 using ComputationalResources
@@ -8,7 +8,7 @@ using MLJBase
 using MLJTuning
 using StableRNGs
 
-const PSO = ParticleSwarmOptimization
+const PSO = MLJParticleSwarmOptimization
 
 include("parameters.jl")
 include("update.jl")

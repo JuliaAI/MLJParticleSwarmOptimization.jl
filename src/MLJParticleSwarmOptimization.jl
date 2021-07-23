@@ -1,4 +1,4 @@
-module ParticleSwarmOptimization
+module MLJParticleSwarmOptimization
 
 using LinearAlgebra
 using Random
