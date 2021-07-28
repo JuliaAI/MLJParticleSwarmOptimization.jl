@@ -53,7 +53,7 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
             acceleration=acceleration
         )
         mach = machine(self_tuning_tree, X, y)
-        fit!(mach, verbosity=2)
+        fit!(mach, verbosity=0)
         rep = report(mach)
         best_loss = rep.best_history_entry.measurement[1]
 
