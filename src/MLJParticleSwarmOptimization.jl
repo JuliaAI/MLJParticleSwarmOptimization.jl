@@ -6,11 +6,12 @@ using Distributions
 using MLJBase
 using MLJTuning
 
-export StaticCoeffs, ParticleSwarm
+export ParticleSwarm, AdaptiveParticleSwarm
 
 include("swarm.jl")
 include("parameters.jl")
 include("update.jl")
 include("strategies/basic.jl")
+include("strategies/adaptive.jl")
 
 end
