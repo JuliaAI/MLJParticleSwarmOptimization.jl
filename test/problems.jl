@@ -1,19 +1,40 @@
-@testset "Optimize" begin
-    function optimize(f, ranges, ps::ParticleSwarm, iter::Int)
-        fields = getproperty.(ranges, :field)
-        state = PSO.initialize(ranges, ps)
-        for i in 1:iter
-            PSO.move!(state, ps)
-            PSO.retrieve!(state, ps)
-            measurements = [f(zip(fields, params)) for params in zip(state.parameters...)]
-            PSO.pbest!(state, ps, measurements)
-            PSO.gbest!(state, ps)
-        end
-        min, particle = findmin(state.pbest)
-        return min, state.pbest_X[particle, :]
+function optimize(f, ranges, ps::ParticleSwarm, iter)
+    fields = getproperty.(ranges, :field)
+    state = PSO.initialize(ranges, ps)
+    for _ in 1:iter
+        PSO.retrieve!(state, ps)
+        measurements = [
+            f(zip(fields, params)) for params in zip(state.parameters...)
+        ]
+        PSO.pbest!(state, ps, measurements)
+        PSO.gbest!(state, ps)
+        PSO.move!(state, ps)
     end
+    min, particle = findmin(state.pbest)
+    return min, state.pbest_X[particle, :]
+end
 
-    @testset "Ackley" begin
+function optimize(f, ranges, ps::AdaptiveParticleSwarm, iter)
+    fields = getproperty.(ranges, :field)
+    state = PSO.initialize(ranges, ps)
+    phase = nothing
+    for _ in 1:iter
+        PSO.retrieve!(state, ps)
+        measurements = [
+            f(zip(fields, params)) for params in zip(state.parameters...)
+        ]
+        PSO.pbest!(state, ps, measurements)
+        PSO.gbest!(state, ps)
+        factor, phase = PSO._evolutionary_state(ps, state, phase)
+        PSO._adapt_parameters!(ps, state, factor, phase)
+        PSO.move!(state, ps)
+    end
+    min, particle = findmin(state.pbest)
+    return min, state.pbest_X[particle, :]
+end
+
+for PS in (ParticleSwarm, AdaptiveParticleSwarm)
+    @testset "Optimize Ackley with $PS" begin
         function ackley(x; a=20, b=0.2, c=2π)
             d = length(x)
             return -a * exp(-b * sqrt(sum(x.^2) / d)) -
@@ -23,7 +44,7 @@
         @testset "Numeric Ackley" begin
             r1 = range(Float64, :r1; lower=-2.0, upper=2.0)
             r2 = range(Float64, :r2; lower=-2.0, upper=2.0)
-            ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
+            ps = PS(n_particles=10, rng=StableRNG(1234))
             min, params = optimize([r1, r2], ps, 1_500_000) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
@@ -34,8 +55,8 @@
         @testset "Integer Ackley" begin
             r1 = range(Int, :r1; lower=-20, upper=20)
             r2 = range(Int, :r2; lower=-20, upper=20)
-            ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
-            min, params = optimize([r1, r2], ps, 100) do pairs
+            ps = PS(n_particles=10, rng=StableRNG(1234))
+            min, params = optimize([r1, r2], ps, 250) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
             end
@@ -46,7 +67,7 @@
             vals = shuffle(StableRNG(1234), -2:2)
             r1 = range(Int, :r1; values=vals)
             r2 = range(Int, :r2; values=vals)
-            ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
+            ps = PS(n_particles=10, rng=StableRNG(1234))
             min, params = optimize([r1, r2], ps, 100) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
@@ -60,8 +81,8 @@
             r1 = range(Float64, :r1; lower=-2.0, upper=2.0)
             r2 = range(Int, :r2; lower=-20, upper=20)
             r3 = range(Int, :r3; values=vals)
-            ps = ParticleSwarm(n_particles=10, rng=StableRNG(1234))
-            min, params = optimize([r1, r2, r3], ps, 15000) do pairs
+            ps = PS(n_particles=20, prob_shift=0.15, rng=StableRNG(1234))
+            min, params = optimize([r1, r2, r3], ps, 20000) do pairs
                 x = [param for (field, param) in pairs]
                 ackley(x)
             end
