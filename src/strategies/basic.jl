@@ -166,10 +166,10 @@ function MLJTuning.models(
 ) where {T}
     n_particles = tuning.n_particles
     if !isnothing(history)
-        sig = MLJTuning.signature(first(history).measure)
+        sign = MLJTuning.signature(history[1].measure[1])
         measurements = Vector{T}(undef, n_particles)
         map(history[end-n_particles+1:end]) do h
-            measurements[h.metadata] = sig * h.measurement[1]
+            measurements[h.metadata] = sign * h.measurement[1]
         end
         pbest!(state, tuning, measurements)
         gbest!(state, tuning)
