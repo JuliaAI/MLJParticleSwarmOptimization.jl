@@ -119,6 +119,6 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
 
         # Compare with random search result with the same settings
         @test best_loss < baseline_best_loss ||
-              isapprox(best_loss, baseline_best_loss, 1e-3)
+              isapprox(best_loss, baseline_best_loss; atol=1e-3)
     end
 end

@@ -51,7 +51,7 @@ for PS in (ParticleSwarm, AdaptiveParticleSwarm)
                 x = [param for (field, param) in pairs]
                 ackley(x)
             end
-            @test all(isapprox.(params, 0, atol=3)) # analytical solution
+            @test all(isapprox.(params, 0; atol=3)) # analytical solution
         end
 
         @testset "Integer Ackley" begin
@@ -75,7 +75,7 @@ for PS in (ParticleSwarm, AdaptiveParticleSwarm)
                 ackley(x)
             end
             true_params = [1., 0., 0., 0., 0., 1., 0., 0., 0., 0.] # analytical solution
-            @test all(isapprox.(params, true_params, atol=1e-3))
+            @test all(isapprox.(params, true_params; atol=1e-3))
         end
 
         @testset "Mixed Ackley" begin
@@ -89,7 +89,7 @@ for PS in (ParticleSwarm, AdaptiveParticleSwarm)
                 ackley(x)
             end
             # Compare with analytical solution
-            @test isapprox(params[1], 0, atol=1e-3)
+            @test isapprox(params[1], 0; atol=1e-3)
             @test round(params[2]) == 0
             @test argmax(params[3:7]) == 1
         end
