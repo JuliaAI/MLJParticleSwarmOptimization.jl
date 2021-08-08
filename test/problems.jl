@@ -6,9 +6,9 @@ function optimize(f, ranges, ps::ParticleSwarm, iter)
         measurements = [
             f(zip(fields, params)) for params in zip(state.parameters...)
         ]
-        PSO.pbest!(state, ps, measurements)
-        PSO.gbest!(state, ps)
-        PSO.move!(state, ps)
+        PSO.pbest!(state, measurements, ps)
+        PSO.gbest!(state)
+        PSO.move!(ps.rng, state, ps.w, ps.c1, ps.c2)
     end
     min, particle = findmin(state.pbest)
     return min, state.pbest_X[particle, :]
@@ -18,16 +18,18 @@ function optimize(f, ranges, ps::AdaptiveParticleSwarm, iter)
     fields = getproperty.(ranges, :field)
     state = PSO.initialize(ranges, ps)
     phase = nothing
+    c1, c2 = ps.c1, ps.c2
     for _ in 1:iter
         PSO.retrieve!(state, ps)
         measurements = [
             f(zip(fields, params)) for params in zip(state.parameters...)
         ]
-        PSO.pbest!(state, ps, measurements)
-        PSO.gbest!(state, ps)
-        factor, phase = PSO._evolutionary_state(ps, state, phase)
-        PSO._adapt_parameters!(ps, state, factor, phase)
-        PSO.move!(state, ps)
+        PSO.pbest!(state, measurements, ps)
+        PSO.gbest!(state)
+        factor = PSO._evolutionary_factor(state.X, argmin(state.pbest))
+        phase = PSO._evolutionary_phase(factor, phase)
+        w, c1, c2 = PSO._adapt_parameters(ps.rng, c1, c2, factor, phase)
+        PSO.move!(ps.rng, state, w, c1, c2)
     end
     min, particle = findmin(state.pbest)
     return min, state.pbest_X[particle, :]

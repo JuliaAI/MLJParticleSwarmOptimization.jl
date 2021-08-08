@@ -22,8 +22,7 @@
             Float64[],
             Float64[]
         )
-        ps = ParticleSwarm(n_particles=3, rng=StableRNG(8888))
-        PSO.move!(dummy_state, ps)
+        PSO.move!(StableRNG(8888), dummy_state, 1.0, 2.0, 2.0)
 
         @test all(0 .<= X[:, 1:3] .<= 1)
         @test all(sum(X[:, 1:3]; dims=2) .== 1)
@@ -35,12 +34,12 @@
                    0.11411862296972314    0.8858813770302767  1.967051803731305e-16 2.5742724788985445 1.0                 73.175744055348   ]
     end
 
-    ps = ParticleSwarm(n_particles=3, rng=StableRNG(1234))
-    state = PSO.initialize([r1, r2, r3, r4], ps)
-    PSO.retrieve!(state, ps)
+    rng = StableRNG(1234)
+    state = PSO.initialize(rng, [r1, r2, r3, r4], 3)
+    PSO.retrieve!(rng, state)
     measurements = [0.5, 0.1, 0.3]
-    PSO.pbest!(state, ps, measurements)
-    PSO.gbest!(state, ps)
+    PSO.pbest!(state, measurements, 0.25)
+    PSO.gbest!(state)
 
     @testset "Update personal best" begin
         @test state.pbest == measurements

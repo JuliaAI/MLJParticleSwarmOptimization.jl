@@ -4,17 +4,13 @@
 
 # Initialize particle swarm state
 
-function initialize(
-    r::Union{ParamRange, Tuple{ParamRange, Any}},
-    tuning::AbstractParticleSwarm
-)
-    return initialize([r], tuning)
+function initialize(rng::AbstractRNG, r::Union{ParamRange, Tuple{ParamRange, Any}}, n::Int)
+    return initialize(rng, [r], n)
 end
 
-function initialize(rs::AbstractVector, tuning::AbstractParticleSwarm)
-    n = tuning.n_particles
+function initialize(rng::AbstractRNG, rs::AbstractVector, n::Int)
     # `length` is 1 for `NumericRange` and the number of categories for `NominalRange`
-    ranges, parameters, lengths, Xᵢ = zip(_initialize.(tuning.rng, rs, n)...)
+    ranges, parameters, lengths, Xᵢ = zip(_initialize.(rng, rs, n)...)
     indices = _to_indices(lengths)
     X = hcat(Xᵢ...)
     V = zero(X)
@@ -102,9 +98,8 @@ end
 # For updating `state.parameters`, the model hyperparameters to be returned, from their
 # internal representation `state.X`
 
-function retrieve!(state::ParticleSwarmState, tuning::AbstractParticleSwarm)
+function retrieve!(rng::AbstractRNG, state::ParticleSwarmState)
     ranges, params, indices, X = state.ranges, state.parameters, state.indices, state.X
-    rng = tuning.rng
     for (r, p, i) in zip(ranges, params, indices)
         _retrieve!(rng, p, r, view(X, :, i))
     end

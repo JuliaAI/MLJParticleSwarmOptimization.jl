@@ -1,8 +1,7 @@
 # Move the swarm
 
-function move!(state::ParticleSwarmState{T}, tuning::AbstractParticleSwarm) where {T}
-    rng, X, V = tuning.rng, state.X, state.V
-    w, c1, c2 = T(tuning.w), T(tuning.c1), T(tuning.c2)
+function move!(rng::AbstractRNG, state::ParticleSwarmState{T}, w, c1, c2) where {T}
+    X, V = state.X, state.V
     @. V = w*V + c1*rand(rng, T)*(state.pbest_X - X) + c2*rand(rng, T)*(state.gbest_X - X)
     X .+= V
     for (r, idx) in zip(state.ranges, state.indices)
@@ -24,9 +23,8 @@ end
 
 # Update pbest
 
-function pbest!(state::ParticleSwarmState, tuning::AbstractParticleSwarm, measurements)
+function pbest!(state::ParticleSwarmState, measurements, prob_shift)
     X, pbest, pbest_X = state.X, state.pbest, state.pbest_X
-    prob_shift = tuning.prob_shift
     improved = measurements .<= pbest
     pbest[improved] .= measurements[improved]
     for (r, p, i) in zip(state.ranges, state.parameters, state.indices)
@@ -48,7 +46,7 @@ end
 
 # Update gbest
 
-function gbest!(state::ParticleSwarmState, tuning::AbstractParticleSwarm)
+function gbest!(state::ParticleSwarmState)
     pbest, pbest_X, gbest, gbest_X = state.pbest, state.pbest_X, state.gbest, state.gbest_X
     best, i = findmin(pbest)
     gbest .= best

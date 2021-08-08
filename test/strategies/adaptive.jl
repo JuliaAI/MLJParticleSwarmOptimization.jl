@@ -1,4 +1,4 @@
-@testset "AdaptiveParticleSwarm Tuning Parameters" begin
+@testset "AdaptiveParticleSwarm Tuning Hyperparameters" begin
     warning = "AdaptiveParticleSwarm requires at least 3 particles. " *
               "Resetting n_particles=3. " *
               "AdaptiveParticleSwarm requires 1.5 ≤ c1 ≤ 2.5, 1.5 ≤ c2 ≤ 2.5, and " *
@@ -6,13 +6,73 @@
               "AdaptiveParticleSwarm requires 0 ≤ prob_shift < 1. " *
               "Resetting prob_shift=0.25. "
     ps = @test_logs (:warn, warning) AdaptiveParticleSwarm(
-        n_particles=2, w=1, c1=3, c2=3, prob_shift=2
+        n_particles=2, c1=3, c2=3, prob_shift=2
     )
     @test ps.n_particles == 3
-    @test ps.w == 1.0
     @test ps.c1 == 2.0
     @test ps.c2 == 2.0
     @test ps.prob_shift == 0.25
+end
+
+@testset "Evolutionary Algorithm" begin
+    # Evolutionary factor
+    X = [1 1 1; 2 2 2; 10 10 10]
+    # If the global best particle is the closest to all particles, then f is 0
+    @test PSO._evolutionary_factor(X, 2) == 0
+    # If the global best particle is the furthest from all particles, then f is 1
+    @test PSO._evolutionary_factor(X, 3) == 1
+
+    # Evolutionary phase
+    # Initially pick most likely phase
+    @test PSO._evolutionary_phase(0.55, nothing) == 1 # marginal probs [0.75, 0.25, 0, 0]
+    @test PSO._evolutionary_phase(0.25, nothing) == 2 # marginal probs [0, 0.5, 0.25, 0]
+    @test PSO._evolutionary_phase(0.225, nothing) == 3 # marginal probs [0, 0.25, 0.375, 0]
+    @test PSO._evolutionary_phase(0.775, nothing) == 4 # marginal probs [0.25, 0, 0, 0.375]
+    # Move to the next phase if possible
+    @test PSO._evolutionary_phase(0.55, 1) == 2
+    @test PSO._evolutionary_phase(0.25, 2) == 3
+    @test PSO._evolutionary_phase(0.775, 4) == 1
+    # Stay in the current phase if possible and moving to the next is impossible
+    @test PSO._evolutionary_phase(0.55, 2) == 2
+    @test PSO._evolutionary_phase(0.25, 3) == 3
+    @test PSO._evolutionary_phase(0.775, 1) == 1
+    # Pick the most likely phase otherwise
+    @test PSO._evolutionary_phase(0.55, 3) == 1
+    @test PSO._evolutionary_phase(0.25, 4) == 2
+    @test PSO._evolutionary_phase(0.225, 4) == 3
+    @test PSO._evolutionary_phase(0.775, 2) == 4
+
+    # Cognitive and social coefficients clamping
+    @test PSO._clamp_coefficients(1.0, 1.0) == (1.5, 1.5) # lower bound is 1.5
+    @test PSO._clamp_coefficients(3.0, 1.0) == (2.5, 1.5) # upper bound is 2.5
+    @test PSO._clamp_coefficients(2.25, 2.25) == (2.0, 2.0) # sum cannot be larger than 4
+
+    # Coefficient adaptive control
+    rng = StableRNG(1234)
+    # Exploration state
+    f, phase = 0.65, 1
+    w, c1, c2 = PSO._adapt_parameters(rng, 1.75, 1.75, f, phase)
+    @test w == 1 / (1 + 1.5*exp(-2.6*f))
+    @test c1 ≥ 1.8 # increase cognitive
+    @test c2 ≤ 1.7 # decrease social
+    # Exploitation state
+    f, phase = 0.35, 2
+    w, c1, c2 = PSO._adapt_parameters(rng, 1.75, 1.75, f, phase)
+    @test w == 1 / (1 + 1.5*exp(-2.6*f))
+    @test 1.775 ≤ c1 ≤ 1.8 # slightly increase cognitive
+    @test 1.7 ≤ c2 ≤ 1.725 # slightly decrease social
+    # Convergence state
+    f, phase = 0.0, 3
+    w, c1, c2 = PSO._adapt_parameters(rng, 1.75, 1.75, f, phase)
+    @test w == 1 / (1 + 1.5*exp(-2.6*f))
+    @test 1.775 ≤ c1 ≤ 1.8 # slightly increase cognitive
+    @test 1.775 ≤ c2 ≤ 1.8 # slightly increase social
+    # Jumping out state
+    f, phase = 1.0, 4
+    w, c1, c2 = PSO._adapt_parameters(rng, 1.75, 1.75, f, phase)
+    @test w == 1 / (1 + 1.5*exp(-2.6*f))
+    @test c1 ≤ 1.7 # decrease cognitive
+    @test c2 ≥ 1.8 # increase social
 end
 
 for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
