@@ -1,4 +1,4 @@
-@testset "Swarm Tuning Parameters" begin
+@testset "ParticleSwarm Tuning Parameters" begin
     warning = "ParticleSwarm requires at least 3 particles. Resetting n_particles=3. " *
               "ParticleSwarm requires w ≥ 0. Resetting w=1. " *
               "ParticleSwarm requires c1 ≥ 0. Resetting c1=2. " *
@@ -15,7 +15,7 @@
 end
 
 for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
-    @testset "EvoTree Tuning with $(typeof(acceleration))" begin
+    @testset "EvoTree Tuning with ParticleSwarm and $(typeof(acceleration))" begin
         rng = StableRNG(123)
         features = rand(rng, 10_000) .* 5 .- 2
         X = MLJBase.table(reshape(features, (size(features)[1], 1)))
@@ -58,6 +58,6 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
 
         # Compare with random search result with the same settings
         @test best_loss < baseline_best_loss ||
-              isapprox(best_loss, baseline_best_loss, 1e-3)
+              isapprox(best_loss, baseline_best_loss; atol=1e-3)
     end
 end

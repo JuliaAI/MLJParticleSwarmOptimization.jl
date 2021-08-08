@@ -69,9 +69,9 @@
     end
 
     @testset "Initialize one range" begin
-        ps = ParticleSwarm(n_particles=n, rng=StableRNG(1234))
+        rng = StableRNG(1234)
         for (r, l, i, X) in zip(rs, lengths, indices, Xs)
-            state = PSO.initialize(r, ps)
+            state = PSO.initialize(rng, r, n)
             @test state.ranges == (r,)
             @test state.indices == (l == 1 ? 1 : 1:l,)
             @test state.X ≈ X
@@ -79,19 +79,19 @@
     end
 
     @testset "Initialize multiple ranges" begin
-        ps = ParticleSwarm(n_particles=n, rng=StableRNG(1234))
+        rng = StableRNG(1234)
         ranges = [r1, (r2, Uniform), (r3, d3), r4]
-        state = PSO.initialize(ranges, ps)
+        state = PSO.initialize(rng, ranges, n)
         @test state.ranges == rs
         @test state.indices == indices
         @test state.X ≈ hcat(Xs...)
     end
 
     @testset "Retrieve parameters" begin
-        ps = ParticleSwarm(n_particles=n, rng=StableRNG(1234))
+        rng = StableRNG(1234)
         ranges = [r1, (r2, Uniform), (r3, d3), r4]
-        state = PSO.initialize(ranges, ps)
-        PSO.retrieve!(state, ps)
+        state = PSO.initialize(rng, ranges, n)
+        PSO.retrieve!(rng, state)
         @test state.parameters == (
             ["a", "a", "c"],
             [553, 250, 375],
