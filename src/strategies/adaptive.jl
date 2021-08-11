@@ -225,3 +225,13 @@ function _adapt_parameters(rng, c1, c2, f, phase)
     c1, c2 = _clamp_coefficients(c1, c2)
     return w, c1, c2
 end
+
+function MLJTuning.tuning_report(
+    tuning::AdaptiveParticleSwarm,
+    history,
+    (state, phase, c1, c2)
+)
+    fields = getproperty.(state.ranges, :field)
+    scales = MLJBase.scale.(state.ranges)
+    return (; plotting = MLJTuning.plotting_report(fields, scales, history))
+end
