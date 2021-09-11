@@ -91,10 +91,9 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
         baseline_self_tuning_tree = TunedModel(
             model=tree,
             tuning=RandomSearch(rng=StableRNG(1234)),
-            # tuning=ParticleSwarm(n_particles=3, rng=rng),
             resampling=CV(nfolds=5, rng=StableRNG(8888)),
             range=[r1, r2],
-            measure=(ŷ, y) -> mean(abs.(ŷ .- y)),
+            measure=mae,
             n=15,
             acceleration=acceleration
         )
@@ -108,7 +107,7 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
             tuning=AdaptiveParticleSwarm(rng=StableRNG(1234)),
             resampling=CV(nfolds=5, rng=StableRNG(8888)),
             range=[r1, r2],
-            measure=(ŷ, y) -> mean(abs.(ŷ .- y)),
+            measure=mae,
             n=15,
             acceleration=acceleration
         )
