@@ -120,15 +120,12 @@ for acceleration in modes
         best_loss = rep.best_history_entry.measurement[1]
         push!(losses, best_loss)
 
-        @show best_loss baseline_best_loss
-
         # There is no reason to expect PSO to be better than
-        # RandomSearch, but they should give results with similar order
-        # of magnitude:
+        # RandomSearch, but they should give similar results, say within 10%:
 
-        @test abs(best_loss/baseline_best_loss - 1) < 1
+        @test abs(best_loss/baseline_best_loss - 1) < 0.1
     end
 end
 
 println("Adaptive PSO losses (see Issue #14):")
-(; modes, losses) |> MLJBase.pretty
+(; modes=modes, losses=losses) |> MLJBase.pretty
