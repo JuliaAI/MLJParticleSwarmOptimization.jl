@@ -92,11 +92,10 @@
         ranges = [r1, (r2, Uniform), (r3, d3), r4]
         state = PSO.initialize(rng, ranges, n)
         PSO.retrieve!(rng, state)
-        @test state.parameters == (
-            ["a", "a", "c"],
-            [553, 250, 375],
-            [3.9372495283243105, 3.6569395920512977, 3.6354556967115146],
-            [-0.8067647f0, 0.4209916f0, 0.6736019f0]
-        )
+        params =  state.parameters
+        @test params[1] == ["a", "a", "c"]
+        @test params[2] ≈  [553, 250, 375]
+        @test params[3] ≈  [3.9372495283243105, 3.6569395920512977, 3.6354556967115146]
+        @test params[4] ≈ [-0.8067647f0, 0.4209916f0, 0.6736019f0]
     end
 end
