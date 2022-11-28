@@ -25,7 +25,7 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
 
         tree = EvoTreeRegressor(rng=rng)
         r1 = range(tree, :max_depth; values=[3:7;])
-        r2 = range(tree, :η; lower=-2, upper=0, scale=exp10)
+        r2 = range(tree, :eta; lower=-2, upper=0, scale=exp10)
 
         baseline_self_tuning_tree = TunedModel(
             model=tree,
