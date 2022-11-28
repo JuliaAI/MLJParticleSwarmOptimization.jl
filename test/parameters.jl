@@ -93,9 +93,13 @@
         state = PSO.initialize(rng, ranges, n)
         PSO.retrieve!(rng, state)
         params =  state.parameters
-        @test params[1] == ["a", "a", "c"]
-        @test params[2] ≈  [553, 250, 375]
-        @test params[3] ≈  [3.9372495283243105, 3.6569395920512977, 3.6354556967115146]
-        @test params[4] ≈ [-0.8067647f0, 0.4209916f0, 0.6736019f0]
+        @test params[1] isa AbstractVector{<:AbstractString}
+        @test params[2] isa AbstractVector{<:Integer}
+        @test params[3] isa AbstractVector{<:AbstractFloat}
+        @test params[4] isa AbstractVector{<:AbstractFloat}
+        @test length(params[4]) == 3
+        @test all(params) do p
+            length(p) == n
+        end
     end
 end
