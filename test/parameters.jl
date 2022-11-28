@@ -87,20 +87,19 @@
         @test state.X ≈ hcat(Xs...)
     end
 
-    # Distributions 0.25.60 broke the tests marked broken below. Comment from @ablaom: I'd
-    # say tests that dependend on implementation details of Distributions are not good
-    # tests, and these should be replaced by more robust tests in the future. I'm guessing
-    # these are really just integration tests.  TODO: fix these tests
     @testset "Retrieve parameters" begin
         rng = StableRNG(1234)
         ranges = [r1, (r2, Uniform), (r3, d3), r4]
         state = PSO.initialize(rng, ranges, n)
         PSO.retrieve!(rng, state)
         params =  state.parameters
-        @test_broken  params[1] == ["a", "a", "c"]
-        @test params[2] ≈  [553, 250, 375]
-        @test_broken @test params[3] ≈
-            [3.9372495283243105, 3.6569395920512977, 3.6354556967115146]
-        @test_broken params[4] ≈ [-0.8067647f0, 0.4209916f0, 0.6736019f0]
+        @test params[1] isa AbstractVector{<:AbstractString}
+        @test params[2] isa AbstractVector{<:Integer}
+        @test params[3] isa AbstractVector{<:AbstractFloat}
+        @test params[4] isa AbstractVector{<:AbstractFloat}
+        @test length(params[4]) == 3
+        @test all(params) do p
+            length(p) == n
+        end
     end
 end
