@@ -112,7 +112,7 @@ function ParticleSwarm(;
     prob_shift=0.25,
     rng::R=Random.GLOBAL_RNG
 ) where {R}
-    swarm = ParticleSwarm{R}(n_particles, w, c1, c2, prob_shift, rng)
+    swarm = ParticleSwarm(n_particles, w, c1, c2, prob_shift, rng)
     message = MLJTuning.clean!(swarm)
     isempty(message) || @warn message
     return swarm

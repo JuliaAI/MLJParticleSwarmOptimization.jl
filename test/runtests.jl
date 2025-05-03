@@ -1,6 +1,3 @@
-using Distributed
-addprocs(2)
-
 @everywhere begin
     using MLJParticleSwarmOptimization
     using Random
@@ -8,6 +5,7 @@ addprocs(2)
     using ComputationalResources
     using Distributions
     using EvoTrees
+    using MLJ
     using MLJBase
     using MLJTuning
     using StableRNGs

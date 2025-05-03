@@ -32,7 +32,7 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
             tuning=RandomSearch(rng=StableRNG(1234)),
             resampling=CV(nfolds=5, rng=StableRNG(8888)),
             range=[r1, r2],
-            measure=mae,
+            measure=MLJ.mae,
             n=15,
             acceleration=acceleration
         )
