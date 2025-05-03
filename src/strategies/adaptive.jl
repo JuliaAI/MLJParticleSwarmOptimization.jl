@@ -40,15 +40,6 @@ copy of `model`. If the corresponding range has a specified `scale` function,
 then the transformation is applied before the hyperparameter is returned. If
 `scale` is a symbol (eg, `:log`), it is ignored.
 """
-mutable struct AdaptiveParticleSwarm{R<:AbstractRNG} <: AbstractParticleSwarm
-    n_particles::Int
-    c1::Float64
-    c2::Float64
-    prob_shift::Float64
-    rng::R
-end
-
-# Constructor
 
 function AdaptiveParticleSwarm(;
     n_particles=3,

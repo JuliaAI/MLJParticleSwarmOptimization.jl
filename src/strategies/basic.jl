@@ -103,15 +103,6 @@ where pₛ is the probability of the sampled hyperparameter value. For more
 information, refer to "A New Discrete Particle Swarm Optimization Algorithm" by
 Strasser, Goodman, Sheppard, and Butcher.
 """
-mutable struct ParticleSwarm{R<:AbstractRNG} <: AbstractParticleSwarm
-    n_particles::Int
-    w::Float64
-    c1::Float64
-    c2::Float64
-    prob_shift::Float64
-    rng::R
-    # TODO: topology
-end
 
 function ParticleSwarm(;
     n_particles=3,
