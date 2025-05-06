@@ -13,5 +13,5 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 [compat]
 Distributions = "0.25"
 MLJBase = "0.18, 0.19, 0.20, 0.21"
-MLJTuning = "0.6, 0.7"
+MLJTuning = "0.6, 0.7, 0.8"
 julia = "1.6"
