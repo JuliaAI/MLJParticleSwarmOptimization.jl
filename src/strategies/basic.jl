@@ -103,15 +103,6 @@ where pₛ is the probability of the sampled hyperparameter value. For more
 information, refer to "A New Discrete Particle Swarm Optimization Algorithm" by
 Strasser, Goodman, Sheppard, and Butcher.
 """
-mutable struct ParticleSwarm{R<:AbstractRNG} <: AbstractParticleSwarm
-    n_particles::Int
-    w::Float64
-    c1::Float64
-    c2::Float64
-    prob_shift::Float64
-    rng::R
-    # TODO: topology
-end
 
 function ParticleSwarm(;
     n_particles=3,
@@ -121,7 +112,7 @@ function ParticleSwarm(;
     prob_shift=0.25,
     rng::R=Random.GLOBAL_RNG
 ) where {R}
-    swarm = ParticleSwarm{R}(n_particles, w, c1, c2, prob_shift, rng)
+    swarm = ParticleSwarm(n_particles, w, c1, c2, prob_shift, rng)
     message = MLJTuning.clean!(swarm)
     isempty(message) || @warn message
     return swarm

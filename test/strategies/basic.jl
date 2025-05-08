@@ -18,7 +18,7 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
     @testset "EvoTree Tuning with ParticleSwarm and $(typeof(acceleration))" begin
         rng = StableRNG(123)
         features = rand(rng, 10_000) .* 5 .- 2
-        X = MLJBase.table(reshape(features, (size(features)[1], 1)))
+        X = MLJ.table(reshape(features, (size(features)[1], 1)))
         y = sin.(features) .* 0.5 .+ 0.5
         y = EvoTrees.logit(y) + randn(rng, size(y))
         y = EvoTrees.sigmoid(y)
@@ -32,7 +32,7 @@ for acceleration in (CPU1(), CPUProcesses(), CPUThreads())
             tuning=RandomSearch(rng=StableRNG(1234)),
             resampling=CV(nfolds=5, rng=StableRNG(8888)),
             range=[r1, r2],
-            measure=mae,
+            measure=MLJ.mae,
             n=15,
             acceleration=acceleration
         )

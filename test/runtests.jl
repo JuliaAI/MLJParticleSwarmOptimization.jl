@@ -8,7 +8,7 @@ addprocs(2)
     using ComputationalResources
     using Distributions
     using EvoTrees
-    using MLJBase
+    using MLJ
     using MLJTuning
     using StableRNGs
 end
